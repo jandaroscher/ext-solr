@@ -100,7 +100,7 @@ class ConnectionManager implements SingletonInterface
      */
     public function getConnectionFromConfiguration(array $config)
     {
-        if (empty($config['read']) && !empty($config['solrHost'])) {
+        if (empty($config['read'])) {
             throw new InvalidArgumentException('Invalid registry data please re-initialize your solr connections');
         }
 
