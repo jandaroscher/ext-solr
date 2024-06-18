@@ -27,6 +27,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\QueryGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Abstract update handler
@@ -275,7 +276,15 @@ abstract class AbstractUpdateHandler
             return true;
         }
 
+        // Return true if triggerConfiguration field value is '*' and it's key is in changedFields array
+        foreach ($triggerConfiguration['changeSet'] as $key => $value) {
+            if ($value === '*' && array_key_exists($key, $changedFields)) {
+                return true;
+            }
+        }
+
         $diff = array_diff_assoc($triggerConfiguration['changeSet'], $changedFields);
+
         return empty($diff);
     }
 
