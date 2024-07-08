@@ -148,7 +148,7 @@ class PageFieldMappingIndexer implements SubstitutePageIndexer
                 $fieldValue = unserialize($fieldValue);
             }
         } else {
-            $fieldValue = $pageRecord[$pageIndexingConfiguration[$solrFieldName]];
+            $fieldValue = $pageRecord[$pageIndexingConfiguration[$solrFieldName]] ?? null;
         }
 
         return $fieldValue;
