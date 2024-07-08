@@ -248,6 +248,8 @@ class Faceting implements Modifier, SearchRequestAware
             $filters = array_keys($filters);
         }
         foreach ($filters as $filter) {
+            $filter = (string) $filter;
+
             if (strpos($filter, ':') === false) {
                 continue;
             }
