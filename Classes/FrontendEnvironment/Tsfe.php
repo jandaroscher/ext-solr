@@ -141,10 +141,29 @@ class Tsfe implements SingletonInterface
             // access to the page in any case to make getPageAndRootline() work
             // see http://forge.typo3.org/issues/42122
             $pageRecord = BackendUtility::getRecord('pages', $pageId, 'fe_group');
+
+            // Check rootline for feGroups from page with extendToSubpages set
+            $rootline = BackendUtility::BEgetRootLine($pageId);
+            // remove the current page from the rootline
+            array_shift($rootline);
+            $rootlineUserGroups = [];
+            foreach ($rootline as $page) {
+                // Skip root node, invalid pages and pages which do not define extendToSubpages
+                if ((int)($page['uid'] ?? 0) <= 0 || !($page['extendToSubpages'] ?? false)) {
+                    continue;
+                }
+                $rootlineUserGroups = explode(',', $page['fe_group']);
+                // Stop as soon as a page in the rootline has extendToSubpages set
+                break;
+            }
+            
             if (!empty($pageRecord['fe_group'])) {
                 $userGroups = explode(',', $pageRecord['fe_group']);
+
+                // If page has set usergroups and usergroups where also found in rootline combine them so the TSFE object can be built correctly
+                $userGroups = $rootlineUserGroups ? array_unique(array_merge($userGroups, $rootlineUserGroups)) : $userGroups;
             } else {
-                $userGroups = [0, -1];
+                $userGroups = $rootlineUserGroups ?: [0, -1];
             }
             $feUser->user = ['uid' => 0, 'username' => '', 'usergroup' => implode(',', $userGroups) ];
             $feUser->fetchGroupData($serverRequest);
